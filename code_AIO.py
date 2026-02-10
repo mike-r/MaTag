@@ -6,7 +6,7 @@ import socketpool
 import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 import adafruit_connection_manager
-
+all_haikus = []
 
 # Get our username, key and desired timezone
 ssid = os.getenv("CIRCUITPY_WIFI_SSID")
@@ -47,23 +47,45 @@ print("-" * 40)
 
 # if there are AIO credentials
 if None not in {aio_username, aio_key}:
-    # Initialize connection_manager and requests
+    print("Initialize connection_manager and requests")
     pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
     ssl_context = adafruit_connection_manager.get_radio_ssl_context(wifi.radio)
     requests = adafruit_requests.Session(pool, ssl_context)
-    # Initialize an Adafruit IO HTTP API object
+    print("Initialize an Adafruit IO HTTP API object")
     io = IO_HTTP(aio_username, aio_key, requests)
 
 # if the AdafruitIO connection is active
+speedster_fr_data_from_io = "22"
 if io is not None:
     try:
-        # Connect to the Speedster Fuel Remaining IO feed
-        speedster_fuelremaing_feed = io.get_feed("speedster.fuelremaing")
-        # Retrieve data value from the feed
-        print("Retrieving data from Speester Fuel Remaining feed...")
-        speedster_fr_data_from_io = io.receive_all_data(speedster_fuelremaing_feed["key"])
+        print("Connect to the Speedster Fuel Remaining IO feed")
+
+        speedster_group = io.get_group("speedster")  # refresh data via HTTP API
+        print(speedster_group)
+        print()
+        print()
+        #print("2:", speedster_group[2])
+        speedster_feeds = speedster_group["feeds"]
+        fuel_remaining = {speedster_feeds[0]["last_value"]}
+        feed0 = {speedster_feeds[0]["name"]}.pop()
+        feed1 = {speedster_feeds[1]["name"]}.pop()
+        feed2 = {speedster_feeds[2]["name"]}.pop()
+        feed3 = {speedster_feeds[3]["name"]}.pop()
+        feed4 = {speedster_feeds[4]["name"]}.pop()
+        feed5 = {speedster_feeds[5]["name"]}.pop()
+
+        last_Value0 = {speedster_feeds[0]["last_value"]}.pop()
+        last_Value1 = {speedster_feeds[1]["last_value"]}.pop()
+        last_Value2 = {speedster_feeds[2]["last_value"]}.pop()
+        last_Value3 = {speedster_feeds[3]["last_value"]}.pop()
+        last_Value4 = {speedster_feeds[4]["last_value"]}.pop()
+        last_Value5 = {speedster_feeds[5]["last_value"]}.pop()
+
+        print("Feed 0:", feed0, last_Value0)
+        print("Feed 1:", feed1, last_Value1)
+        print("Feed 2:", feed2, last_Value2)
+        print("Feed 3:", feed3, last_Value3)
+        print("Feed 4:", feed4, last_Value4)
+        print("Feed 5:", feed5, last_Value5)
     except:
         pass
-    print("speedster fuel remaining: ", speedster_fr_data_from_io)
-
-
