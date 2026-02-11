@@ -70,36 +70,15 @@ if io is not None:
         num_feeds = len(speedster_feeds)
         print("Number of Feeds: ", num_feeds)
 
+        i=0
         for num_feeds in speedster_feeds:
             #print("i: ", i)
             #print({speedster_feeds[i]["name"]}.pop(), {speedster_feeds[i]["last_value"]}.pop())
             feed_name.append({speedster_feeds[i]["name"]}.pop())
             feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
-            print("Feed Name:", feed_name[i], " feed_last_value", feed_last_value[i])
-            #print(x, y)
-            #print(type(y))
+            print(feed_name[i], feed_last_value[i])
             i=i+1    
         print()
 
-        feed0 = {speedster_feeds[0]["name"]}.pop()
-        feed1 = {speedster_feeds[1]["name"]}.pop()
-        feed2 = {speedster_feeds[2]["name"]}.pop()
-        feed3 = {speedster_feeds[3]["name"]}.pop()
-        feed4 = {speedster_feeds[4]["name"]}.pop()
-        feed5 = {speedster_feeds[5]["name"]}.pop()
-
-        last_Value0 = {speedster_feeds[0]["last_value"]}.pop()
-        last_Value1 = {speedster_feeds[1]["last_value"]}.pop()
-        last_Value2 = {speedster_feeds[2]["last_value"]}.pop()
-        last_Value3 = {speedster_feeds[3]["last_value"]}.pop()
-        last_Value4 = {speedster_feeds[4]["last_value"]}.pop()
-        last_Value5 = {speedster_feeds[5]["last_value"]}.pop()
-
-        #print("Feed 0:", feed0, last_Value0)
-        #print("Feed 1:", feed1, last_Value1)
-        #print("Feed 2:", feed2, last_Value2)
-        #print("Feed 3:", feed3, last_Value3)
-        #print("Feed 4:", feed4, last_Value4)
-        #print("Feed 5:", feed5, last_Value5)
     except:
-        pass
+        print("didnt get AIO feeds")
