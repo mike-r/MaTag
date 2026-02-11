@@ -7,6 +7,8 @@ import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 import adafruit_connection_manager
 all_haikus = []
+feed_name = []
+feed_last_value = []
 
 # Get our username, key and desired timezone
 ssid = os.getenv("CIRCUITPY_WIFI_SSID")
@@ -59,14 +61,26 @@ speedster_fr_data_from_io = "22"
 if io is not None:
     try:
         print("Connect to the Speedster Fuel Remaining IO feed")
-
         speedster_group = io.get_group("speedster")  # refresh data via HTTP API
         print(speedster_group)
         print()
         print()
         #print("2:", speedster_group[2])
         speedster_feeds = speedster_group["feeds"]
-        fuel_remaining = {speedster_feeds[0]["last_value"]}
+        num_feeds = len(speedster_feeds)
+        print("Number of Feeds: ", num_feeds)
+
+        for num_feeds in speedster_feeds:
+            #print("i: ", i)
+            #print({speedster_feeds[i]["name"]}.pop(), {speedster_feeds[i]["last_value"]}.pop())
+            feed_name.append({speedster_feeds[i]["name"]}.pop())
+            feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
+            print("Feed Name:", feed_name[i], " feed_last_value", feed_last_value[i])
+            #print(x, y)
+            #print(type(y))
+            i=i+1    
+        print()
+
         feed0 = {speedster_feeds[0]["name"]}.pop()
         feed1 = {speedster_feeds[1]["name"]}.pop()
         feed2 = {speedster_feeds[2]["name"]}.pop()
@@ -81,11 +95,11 @@ if io is not None:
         last_Value4 = {speedster_feeds[4]["last_value"]}.pop()
         last_Value5 = {speedster_feeds[5]["last_value"]}.pop()
 
-        print("Feed 0:", feed0, last_Value0)
-        print("Feed 1:", feed1, last_Value1)
-        print("Feed 2:", feed2, last_Value2)
-        print("Feed 3:", feed3, last_Value3)
-        print("Feed 4:", feed4, last_Value4)
-        print("Feed 5:", feed5, last_Value5)
+        #print("Feed 0:", feed0, last_Value0)
+        #print("Feed 1:", feed1, last_Value1)
+        #print("Feed 2:", feed2, last_Value2)
+        #print("Feed 3:", feed3, last_Value3)
+        #print("Feed 4:", feed4, last_Value4)
+        #print("Feed 5:", feed5, last_Value5)
     except:
         pass
