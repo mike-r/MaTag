@@ -1,5 +1,6 @@
 import ipaddress
 import os
+import time
 import ssl
 import wifi
 import socketpool
@@ -30,7 +31,19 @@ for network in wifi.radio.start_scanning_networks():
 wifi.radio.stop_scanning_networks()
 
 print("Connecting to", ssid)
-wifi.radio.connect(ssid, password)
+
+wifi_good = False
+
+while not wifi_good:
+    try:
+        wifi.radio.connect(ssid, password)
+        wifi_good = True
+    except:
+        print("Hangar SSID not avaliable")
+        time.sleep(10)
+        wifi_good - False
+        wifi_good - False
+
 print(f"Connected to {ssid}!")
 print("My IP address is", wifi.radio.ipv4_address)
 
@@ -62,7 +75,7 @@ if io is not None:
     try:
         print("Connect to the Speedster Fuel Remaining IO feed")
         speedster_group = io.get_group("speedster")  # refresh data via HTTP API
-        print(speedster_group)
+        #print(speedster_group)
         print()
         print()
         #print("2:", speedster_group[2])
