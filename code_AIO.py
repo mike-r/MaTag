@@ -1,12 +1,15 @@
 import ipaddress
 import os
 import time
+import terminalio
 import ssl
 import wifi
 import socketpool
 import adafruit_requests
 from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 import adafruit_connection_manager
+from adafruit_magtag.magtag import MagTag
+
 all_haikus = []
 feed_name = []
 feed_last_value = []
@@ -33,6 +36,19 @@ wifi.radio.stop_scanning_networks()
 print("Connecting to", ssid)
 
 wifi_good = False
+
+magtag = MagTag()
+magtag.peripherals.neopixel_disable = False
+
+magtag.add_text(
+    text_font=terminalio.FONT,
+    text_position=(140, 55),
+    text_scale=7,
+    text_anchor_point=(0.5, 0.5),
+)
+
+magtag.set_text("00:00")
+
 
 while not wifi_good:
     try:
