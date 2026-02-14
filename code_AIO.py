@@ -10,7 +10,6 @@ from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 import adafruit_connection_manager
 from adafruit_magtag.magtag import MagTag
 
-all_haikus = []
 feed_name = []
 feed_last_value = []
 
@@ -42,12 +41,12 @@ magtag.peripherals.neopixel_disable = False
 
 magtag.add_text(
     text_font=terminalio.FONT,
-    text_position=(140, 55),
-    text_scale=7,
+    text_position=(145, 17),
+    text_scale=4,
     text_anchor_point=(0.5, 0.5),
 )
 
-magtag.set_text("00:00")
+magtag.set_text("N221TM")
 
 
 while not wifi_good:
@@ -57,7 +56,6 @@ while not wifi_good:
     except:
         print("Hangar SSID not avaliable")
         time.sleep(10)
-        wifi_good - False
         wifi_good - False
 
 print(f"Connected to {ssid}!")
@@ -86,7 +84,7 @@ if None not in {aio_username, aio_key}:
     io = IO_HTTP(aio_username, aio_key, requests)
 
 # if the AdafruitIO connection is active
-speedster_fr_data_from_io = "22"
+
 if io is not None:
     try:
         print("Connect to the Speedster Fuel Remaining IO feed")
@@ -94,15 +92,12 @@ if io is not None:
         #print(speedster_group)
         print()
         print()
-        #print("2:", speedster_group[2])
         speedster_feeds = speedster_group["feeds"]
         num_feeds = len(speedster_feeds)
         print("Number of Feeds: ", num_feeds)
 
         i=0
         for num_feeds in speedster_feeds:
-            #print("i: ", i)
-            #print({speedster_feeds[i]["name"]}.pop(), {speedster_feeds[i]["last_value"]}.pop())
             feed_name.append({speedster_feeds[i]["name"]}.pop())
             feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
             print(feed_name[i], feed_last_value[i])
@@ -111,3 +106,5 @@ if io is not None:
 
     except:
         print("didnt get AIO feeds")
+        
+time.sleep(15)
