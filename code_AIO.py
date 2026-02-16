@@ -12,7 +12,8 @@ from adafruit_magtag.magtag import MagTag
 
 feed_name = []
 feed_last_value = []
-alarm_set = False
+big_speedey_feed_name = []
+big_speedey_feed_last_value = []
 
 # Get our username, key and desired timezone
 ssid = os.getenv("CIRCUITPY_WIFI_SSID")
@@ -27,11 +28,11 @@ print("ESP32-S2 Adafruit IO Time test")
 
 print("My MAC addr:", [hex(i) for i in wifi.radio.mac_address])
 
-print("Available WiFi networks:")
-for network in wifi.radio.start_scanning_networks():
-    print("\t%s\t\tRSSI: %d\tChannel: %d" % (str(network.ssid, "utf-8"),
-            network.rssi, network.channel))
-wifi.radio.stop_scanning_networks()
+#print("Available WiFi networks:")
+#for network in wifi.radio.start_scanning_networks():
+    #print("\t%s\t\tRSSI: %d\tChannel: %d" % (str(network.ssid, "utf-8"),
+            #network.rssi, network.channel))
+#wifi.radio.stop_scanning_networks()
 
 print("Connecting to", ssid)
 
@@ -70,7 +71,7 @@ magtag.add_text(
     text_anchor_point=(0.5, 0.5),
 )
 
-magtag.set_text("N221TM",0, True)
+magtag.set_text("TronView",0, True)
 
 while not wifi_good:
     try:
@@ -85,17 +86,16 @@ print(f"Connected to {ssid}!")
 print("My IP address is", wifi.radio.ipv4_address)
 
 ipv4 = ipaddress.ip_address("8.8.4.4")
-print("Ping google.com:", wifi.radio.ping(ipv4), "ms")
+#print("Ping google.com:", wifi.radio.ping(ipv4), "ms")
 
 pool = socketpool.SocketPool(wifi.radio)
 requests = adafruit_requests.Session(pool, ssl.create_default_context())
 
-print("Fetching text from", TIME_URL)
+#rint("Fetching text from", TIME_URL)
 response = requests.get(TIME_URL)
 print("-" * 40)
 print(response.text)
 print("-" * 40)
-
 
 # if there are AIO credentials
 if None not in {aio_username, aio_key}:
@@ -112,16 +112,31 @@ if io is not None:
     try:
         print("Connect to the Speedster Fuel Remaining IO feed")
         speedster_group = io.get_group("speedster")  # refresh data via HTTP API
+        big_speedey_group = io.get_group("3pw")
         #print(speedster_group)
         print()
         print()
         speedster_feeds = speedster_group["feeds"]
-        num_feeds = len(speedster_feeds)
-        print("Number of Feeds: ", num_feeds)
-        print()
+        big_speedey_feeds = big_speedey_group["feeds"]
+        speedster_num_feeds = len(speedster_feeds)
+        big_speedey_num_feeds = len(big_speedey_feeds)
+        print("Number of Speedster Feeds: ", speedster_num_feeds)
+        print("Number of 3PW Feeds: ", big_speedey_num_feeds)
+
+
+
+
+    except:
+        print("didnt get AIO feeds")
+
+while True:
+    if magtag.peripherals.button_a_pressed:
+        print("Button_A Pressed")
+        print("Fetching N221TM Data from Adafruit IO")
+        magtag.set_text("N221TM",0, False)
 
         i=0
-        for num_feeds in speedster_feeds:
+        for speedster_num_feeds in speedster_feeds:
             feed_name.append({speedster_feeds[i]["name"]}.pop())
             feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
             if feed_name[i] == "FuelRemaining":
@@ -136,15 +151,24 @@ if io is not None:
             i=i+1    
         print()
 
-    except:
-        print("didnt get AIO feeds")
-        
-time.sleep(5)
+    elif magtag.peripherals.button_b_pressed:
+        print("Button_B Pressed")
+        print("Fetching N873PW Data from Adafruit IO")
+        magtag.set_text("N873PW",0, False)
+        i=0
+        for big_speedey_num_feeds in big_speedey_feeds:
+            big_speedey_feed_name.append({big_speedey_feeds[i]["name"]}.pop())
+            big_speedey_feed_last_value.append({big_speedey_feeds[i]["last_value"]}.pop())
+            if big_speedey_feed_name[i] == "FuelRemaining":
+                print(big_speedey_feed_name[i], " :", big_speedey_feed_last_value[i])
+                magtag.set_text(big_speedey_feed_name[i] + " :" + big_speedey_feed_last_value[i], 1, False)
+            elif big_speedey_feed_name[i] == "Hobbs":
+                print(big_speedey_feed_name[i], " :", big_speedey_feed_last_value[i])
+                magtag.set_text(big_speedey_feed_name[i] + " :      " + big_speedey_feed_last_value[i], 2, False)
+            elif big_speedey_feed_name[i] == "SmokeLevel":
+                print(big_speedey_feed_name[i], " :", big_speedey_feed_last_value[i])
+                magtag.set_text(big_speedey_feed_name[i] + " :    " + big_speedey_feed_last_value[i], 3, True)
+            i=i+1    
+        print()
 
-
-while True:
-    if not alarm_set:
-        # Set the timer to 1 minute
-        if magtag.peripherals.button_a_pressed:
-            print("Button_A Pressed")
-            alarm_set = True
+    time.sleep(5)
