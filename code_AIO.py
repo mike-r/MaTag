@@ -12,6 +12,7 @@ from adafruit_magtag.magtag import MagTag
 
 feed_name = []
 feed_last_value = []
+alarm_set = False
 
 # Get our username, key and desired timezone
 ssid = os.getenv("CIRCUITPY_WIFI_SSID")
@@ -38,6 +39,8 @@ wifi_good = False
 
 magtag = MagTag()
 magtag.peripherals.neopixel_disable = False
+batt_volts = magtag.peripherals.battery
+print("Battery Voltage: ", batt_volts)
 
 magtag.add_text(
     text_font=terminalio.FONT,
@@ -46,8 +49,28 @@ magtag.add_text(
     text_anchor_point=(0.5, 0.5),
 )
 
-magtag.set_text("N221TM")
+magtag.add_text(
+    text_font=terminalio.FONT,
+    text_position=(12, 55),
+    text_scale=1,
+    text_anchor_point=(0.5, 0.5),
+)
 
+magtag.add_text(
+    text_font=terminalio.FONT,
+    text_position=(120, 80),
+    text_scale=1,
+    text_anchor_point=(0.5, 0.5),
+)
+
+magtag.add_text(
+    text_font=terminalio.FONT,
+    text_position=(120, 105),
+    text_scale=1,
+    text_anchor_point=(0.5, 0.5),
+)
+
+magtag.set_text("N221TM",0, True)
 
 while not wifi_good:
     try:
@@ -95,16 +118,33 @@ if io is not None:
         speedster_feeds = speedster_group["feeds"]
         num_feeds = len(speedster_feeds)
         print("Number of Feeds: ", num_feeds)
+        print()
 
         i=0
         for num_feeds in speedster_feeds:
             feed_name.append({speedster_feeds[i]["name"]}.pop())
             feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
-            print(feed_name[i], feed_last_value[i])
+            if feed_name[i] == "FuelRemaining":
+                print(feed_name[i], " :", feed_last_value[i])
+                magtag.set_text(feed_name[i] + " :" + feed_last_value[i], 1, False)
+            elif feed_name[i] == "Hobbs":
+                print(feed_name[i], " :", feed_last_value[i])
+                magtag.set_text(feed_name[i] + " :      " + feed_last_value[i], 2, False)
+            elif feed_name[i] == "SmokeLevel":
+                print(feed_name[i], " :", feed_last_value[i])
+                magtag.set_text(feed_name[i] + " :    " + feed_last_value[i], 3, True)
             i=i+1    
         print()
 
     except:
         print("didnt get AIO feeds")
         
-time.sleep(15)
+time.sleep(5)
+
+
+while True:
+    if not alarm_set:
+        # Set the timer to 1 minute
+        if magtag.peripherals.button_a_pressed:
+            print("Button_A Pressed")
+            alarm_set = True
