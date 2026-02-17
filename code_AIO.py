@@ -52,23 +52,23 @@ magtag.add_text(
 
 magtag.add_text(
     text_font=terminalio.FONT,
-    text_position=(12, 55),
-    text_scale=1,
-    text_anchor_point=(0.5, 0.5),
+    text_position=(10, 55),
+    text_scale=2,
+    #text_anchor_point=(0.5, 0.5),
 )
 
 magtag.add_text(
     text_font=terminalio.FONT,
-    text_position=(120, 80),
-    text_scale=1,
-    text_anchor_point=(0.5, 0.5),
+    text_position=(10, 80),
+    text_scale=2,
+    #text_anchor_point=(0.5, 0.5),
 )
 
 magtag.add_text(
     text_font=terminalio.FONT,
-    text_position=(120, 105),
-    text_scale=1,
-    text_anchor_point=(0.5, 0.5),
+    text_position=(10, 105),
+    text_scale=2,
+    #text_anchor_point=(0.5, 0.5),
 )
 
 magtag.set_text("TronView",0, True)
@@ -140,14 +140,14 @@ while True:
             feed_name.append({speedster_feeds[i]["name"]}.pop())
             feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
             if feed_name[i] == "FuelRemaining":
-                print(feed_name[i], " :", feed_last_value[i])
-                magtag.set_text(feed_name[i] + " :" + feed_last_value[i], 1, False)
+                print(feed_name[i], " ", feed_last_value[i])
+                magtag.set_text(feed_name[i] + " " + feed_last_value[i], 1, False)
             elif feed_name[i] == "Hobbs":
-                print(feed_name[i], " :", feed_last_value[i])
-                magtag.set_text(feed_name[i] + " :      " + feed_last_value[i], 2, False)
+                print(feed_name[i], " ", feed_last_value[i])
+                magtag.set_text(feed_name[i] + "       " + feed_last_value[i], 2, False)
             elif feed_name[i] == "SmokeLevel":
-                print(feed_name[i], " :", feed_last_value[i])
-                magtag.set_text(feed_name[i] + " :    " + feed_last_value[i], 3, True)
+                print(feed_name[i], " ", feed_last_value[i])
+                magtag.set_text(feed_name[i] + "     " + feed_last_value[i], 3, True)
             i=i+1    
         print()
 
@@ -160,15 +160,15 @@ while True:
             big_speedey_feed_name.append({big_speedey_feeds[i]["name"]}.pop())
             big_speedey_feed_last_value.append({big_speedey_feeds[i]["last_value"]}.pop())
             if big_speedey_feed_name[i] == "FuelRemaining":
-                print(big_speedey_feed_name[i], " :", big_speedey_feed_last_value[i])
-                magtag.set_text(big_speedey_feed_name[i] + " :" + big_speedey_feed_last_value[i], 1, False)
+                print(big_speedey_feed_name[i], " ", big_speedey_feed_last_value[i])
+                magtag.set_text(big_speedey_feed_name[i] + " " + big_speedey_feed_last_value[i], 1, False)
             elif big_speedey_feed_name[i] == "Hobbs":
-                print(big_speedey_feed_name[i], " :", big_speedey_feed_last_value[i])
-                magtag.set_text(big_speedey_feed_name[i] + " :      " + big_speedey_feed_last_value[i], 2, False)
+                print(big_speedey_feed_name[i], "  ", big_speedey_feed_last_value[i])
+                magtag.set_text(big_speedey_feed_name[i] + "         " + big_speedey_feed_last_value[i], 2, False)
             elif big_speedey_feed_name[i] == "SmokeLevel":
-                print(big_speedey_feed_name[i], " :", big_speedey_feed_last_value[i])
-                magtag.set_text(big_speedey_feed_name[i] + " :    " + big_speedey_feed_last_value[i], 3, True)
+                print(big_speedey_feed_name[i], " ", big_speedey_feed_last_value[i])
+                magtag.set_text(big_speedey_feed_name[i] + "     " + big_speedey_feed_last_value[i], 3, True)
             i=i+1    
         print()
 
-    time.sleep(5)
+    time.sleep(0.5)
