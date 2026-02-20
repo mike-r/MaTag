@@ -72,7 +72,7 @@ magtag.add_text(
 )
 
 magtag.set_text("TronView",0, False)
-magtag.set_text("batt-Volts: " + str(batt_volts), 2, True)
+magtag.set_text("Batt-Volts: " + str(batt_volts), 1, False)
 
 while not wifi_good:
     try:
@@ -86,7 +86,7 @@ while not wifi_good:
 print(f"Connected to {ssid}!")
 print("My IP address is", wifi.radio.ipv4_address)
 
-magtag.set_text("IPv4 address: " + str(wifi.radio.ipv4_address), 3, True)
+magtag.set_text("WiFi:" + str(wifi.radio.ipv4_address), 3, True)
 
 ipv4 = ipaddress.ip_address("8.8.4.4")
 #print("Ping google.com:", wifi.radio.ping(ipv4), "ms")
@@ -124,10 +124,6 @@ if io is not None:
         big_speedey_num_feeds = len(big_speedey_feeds)
         print("Number of Speedster Feeds: ", speedster_num_feeds)
         print("Number of 3PW Feeds: ", big_speedey_num_feeds)
-
-
-
-
     except:
         print("didnt get AIO feeds")
 
