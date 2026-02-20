@@ -71,7 +71,8 @@ magtag.add_text(
     #text_anchor_point=(0.5, 0.5),
 )
 
-magtag.set_text("TronView",0, True)
+magtag.set_text("TronView",0, False)
+magtag.set_text("batt-Volts: " + str(batt_volts), 2, True)
 
 while not wifi_good:
     try:
@@ -84,6 +85,8 @@ while not wifi_good:
 
 print(f"Connected to {ssid}!")
 print("My IP address is", wifi.radio.ipv4_address)
+
+magtag.set_text("IPv4 address: " + str(wifi.radio.ipv4_address), 3, True)
 
 ipv4 = ipaddress.ip_address("8.8.4.4")
 #print("Ping google.com:", wifi.radio.ping(ipv4), "ms")
@@ -107,10 +110,9 @@ if None not in {aio_username, aio_key}:
     io = IO_HTTP(aio_username, aio_key, requests)
 
 # if the AdafruitIO connection is active
-
 if io is not None:
     try:
-        print("Connect to the Speedster Fuel Remaining IO feed")
+        print("Connect to the Speedster and Big Speedey IO feeds")
         speedster_group = io.get_group("speedster")  # refresh data via HTTP API
         big_speedey_group = io.get_group("3pw")
         #print(speedster_group)
