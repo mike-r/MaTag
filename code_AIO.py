@@ -15,6 +15,25 @@ feed_last_value = []
 big_speedey_feed_name = []
 big_speedey_feed_last_value = []
 
+def pull_feeds():
+    global speedster_feeds
+    global big_speedey_feeds
+    try:
+        print("Connect to the Speedster and Big Speedey IO feeds")
+        speedster_group = io.get_group("speedster")  # refresh data via HTTP API
+        big_speedey_group = io.get_group("3pw")
+        #print(speedster_group)
+        print()
+        print()
+        speedster_feeds = speedster_group["feeds"]
+        big_speedey_feeds = big_speedey_group["feeds"]
+        speedster_num_feeds = len(speedster_feeds)
+        big_speedey_num_feeds = len(big_speedey_feeds)
+        print("Number of Speedster Feeds: ", speedster_num_feeds)
+        print("Number of 3PW Feeds: ", big_speedey_num_feeds)
+    except:
+        print("didnt get AIO feeds")
+
 # Get our username, key and desired timezone
 ssid = os.getenv("CIRCUITPY_WIFI_SSID")
 password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
@@ -111,26 +130,14 @@ if None not in {aio_username, aio_key}:
 
 # if the AdafruitIO connection is active
 if io is not None:
-    try:
-        print("Connect to the Speedster and Big Speedey IO feeds")
-        speedster_group = io.get_group("speedster")  # refresh data via HTTP API
-        big_speedey_group = io.get_group("3pw")
-        #print(speedster_group)
-        print()
-        print()
-        speedster_feeds = speedster_group["feeds"]
-        big_speedey_feeds = big_speedey_group["feeds"]
-        speedster_num_feeds = len(speedster_feeds)
-        big_speedey_num_feeds = len(big_speedey_feeds)
-        print("Number of Speedster Feeds: ", speedster_num_feeds)
-        print("Number of 3PW Feeds: ", big_speedey_num_feeds)
-    except:
-        print("didnt get AIO feeds")
+    pull_feeds()
+
 
 while True:
     if magtag.peripherals.button_a_pressed:
         print("Button_A Pressed")
         print("Fetching N221TM Data from Adafruit IO")
+        pull_feeds()
         magtag.set_text("N221TM",0, False)
 
         i=0
