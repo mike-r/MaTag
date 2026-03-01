@@ -15,25 +15,6 @@ feed_last_value = []
 big_speedey_feed_name = []
 big_speedey_feed_last_value = []
 
-def pull_feeds():
-    global speedster_feeds
-    global big_speedey_feeds
-    try:
-        print("Connect to the Speedster and Big Speedey IO feeds")
-        speedster_group = io.get_group("speedster")  # refresh data via HTTP API
-        big_speedey_group = io.get_group("3pw")
-        #print(speedster_group)
-        print()
-        print()
-        speedster_feeds = speedster_group["feeds"]
-        big_speedey_feeds = big_speedey_group["feeds"]
-        speedster_num_feeds = len(speedster_feeds)
-        big_speedey_num_feeds = len(big_speedey_feeds)
-        print("Number of Speedster Feeds: ", speedster_num_feeds)
-        print("Number of 3PW Feeds: ", big_speedey_num_feeds)
-    except:
-        print("didnt get AIO feeds")
-
 # Get our username, key and desired timezone
 ssid = os.getenv("CIRCUITPY_WIFI_SSID")
 password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
@@ -56,6 +37,43 @@ print("My MAC addr:", [hex(i) for i in wifi.radio.mac_address])
 print("Connecting to", ssid)
 
 wifi_good = False
+
+# if there are AIO credentials
+if None not in {aio_username, aio_key}:
+    print("Initialize connection_manager and requests")
+    pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
+    ssl_context = adafruit_connection_manager.get_radio_ssl_context(wifi.radio)
+    requests = adafruit_requests.Session(pool, ssl_context)
+    print("Initialize an Adafruit IO HTTP API object")
+    io = IO_HTTP(aio_username, aio_key, requests)
+
+def pull_feeds():
+    global speedster_feeds
+    global big_speedey_feeds
+    global speedster_num_feeds
+    global big_speedey_num_feeds
+    speedster_feeds = None
+    big_speedey_feeds = None
+    speedster_group = None
+    big_speedey_group = None
+    try:
+        print("Connect to the Speedster and Big Speedey IO feeds")
+        speedster_group = io.get_group("speedster")  # refresh data via HTTP API
+        big_speedey_group = io.get_group("3pw")
+        print(speedster_group)
+        print()
+        print()
+        speedster_feeds = speedster_group["feeds"]
+        print("speedster_feeds type: ", type(speedster_feeds))
+        print(speedster_feeds)
+        print()
+        big_speedey_feeds = big_speedey_group["feeds"]
+        speedster_num_feeds = len(speedster_feeds)
+        big_speedey_num_feeds = len(big_speedey_feeds)
+        print("Number of Speedster Feeds: ", speedster_num_feeds)
+        print("Number of 3PW Feeds: ", big_speedey_num_feeds)
+    except:
+        print("didnt get AIO feeds")
 
 magtag = MagTag()
 magtag.peripherals.neopixel_disable = False
@@ -119,28 +137,19 @@ print("-" * 40)
 print(response.text)
 print("-" * 40)
 
-# if there are AIO credentials
-if None not in {aio_username, aio_key}:
-    print("Initialize connection_manager and requests")
-    pool = adafruit_connection_manager.get_radio_socketpool(wifi.radio)
-    ssl_context = adafruit_connection_manager.get_radio_ssl_context(wifi.radio)
-    requests = adafruit_requests.Session(pool, ssl_context)
-    print("Initialize an Adafruit IO HTTP API object")
-    io = IO_HTTP(aio_username, aio_key, requests)
-
 # if the AdafruitIO connection is active
 if io is not None:
     pull_feeds()
 
-
+i = -1
 while True:
     if magtag.peripherals.button_a_pressed:
-        print("Button_A Pressed")
+        i=i+1
+        print("Button_A Pressed. i is now: ", i)
         print("Fetching N221TM Data from Adafruit IO")
         pull_feeds()
         magtag.set_text("N221TM",0, False)
 
-        i=0
         for speedster_num_feeds in speedster_feeds:
             feed_name.append({speedster_feeds[i]["name"]}.pop())
             feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
@@ -152,8 +161,10 @@ while True:
                 magtag.set_text(feed_name[i] + "       " + feed_last_value[i], 2, False)
             elif feed_name[i] == "SmokeLevel":
                 print(feed_name[i], " ", feed_last_value[i])
-                magtag.set_text(feed_name[i] + "     " + feed_last_value[i], 3, True)
-            i=i+1    
+                magtag.set_text(feed_name[i] + "     " + feed_last_value[i], 3, True) 
+        print()
+        print("feed_name: ", feed_name[i])
+        print("feed_last_value: ", feed_last_value[i])
         print()
 
     elif magtag.peripherals.button_b_pressed:
@@ -176,4 +187,4 @@ while True:
             i=i+1    
         print()
 
-    time.sleep(0.5)
+    time.sleep(0.25)
