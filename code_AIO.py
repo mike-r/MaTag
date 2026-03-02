@@ -10,11 +10,6 @@ from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 import adafruit_connection_manager
 from adafruit_magtag.magtag import MagTag
 
-feed_name = None
-feed_last_value = None
-big_speedey_feed_name = []
-big_speedey_feed_last_value = []
-
 # Get our username, key and desired timezone
 ssid = os.getenv("CIRCUITPY_WIFI_SSID")
 password = os.getenv("CIRCUITPY_WIFI_PASSWORD")
@@ -47,16 +42,15 @@ if None not in {aio_username, aio_key}:
     print("Initialize an Adafruit IO HTTP API object")
     io = IO_HTTP(aio_username, aio_key, requests)
 
-def pull_feeds(aircraft):
+def pull_feeds(key):
     try:
         print("Connect to the Speedster and Big Speedey IO feeds")
-        aircraft_group = io.get_group(aircraft)  # refresh data via HTTP API
-        print(aircraft_group)
+        aircraft_group = io.get_group(key)  # refresh data via HTTP API
+        #print(aircraft_group)
         print()
         print()
         feeds = aircraft_group["feeds"]
-        print("feeds type: ", type(feeds))
-        print("feeds: ", feeds)
+        #print("feeds: ", feeds)
         print()
         return feeds
     except:
@@ -72,13 +66,16 @@ def print_feeds(aircraft, registration):
             feed_last_value = feeds[i]["last_value"]
             if feed_name == "FuelRemaining":
                 print(feed_name, " ", feed_last_value)
-                magtag.set_text(feed_name + " " + feed_last_value, 1, False)
+                magtag.set_text(feed_name, 1, False)
+                magtag.set_text(feed_last_value, 2, False)
             elif feed_name == "Hobbs":
                 print(feed_name, " ", feed_last_value)
-                magtag.set_text(feed_name + "       " + feed_last_value, 2, False)
+                magtag.set_text(feed_name, 3, False)
+                magtag.set_text(feed_last_value, 4, False)
             elif feed_name == "SmokeLevel":
                 print(feed_name, " ", feed_last_value)
-                magtag.set_text(feed_name + "     " + feed_last_value, 3, True) 
+                magtag.set_text(feed_name, 5, False)
+                magtag.set_text(feed_last_value, 6, True)
         print()
         print("feed_name: ", feed_name)
         print("feed_last_value: ", feed_last_value)
@@ -91,7 +88,7 @@ print("Battery Voltage: ", batt_volts)
 
 magtag.add_text(
     text_font=terminalio.FONT,
-    text_position=(145, 17),
+    text_position=(140, 17),
     text_scale=4,
     text_anchor_point=(0.5, 0.5),
 )
@@ -99,6 +96,12 @@ magtag.add_text(
 magtag.add_text(
     text_font=terminalio.FONT,
     text_position=(10, 55),
+    text_scale=2,
+    #text_anchor_point=(0.5, 0.5),
+)
+magtag.add_text(
+    text_font=terminalio.FONT,
+    text_position=(220, 55),
     text_scale=2,
     #text_anchor_point=(0.5, 0.5),
 )
@@ -112,7 +115,21 @@ magtag.add_text(
 
 magtag.add_text(
     text_font=terminalio.FONT,
+    text_position=(220, 80),
+    text_scale=2,
+    #text_anchor_point=(0.5, 0.5),
+)
+
+magtag.add_text(
+    text_font=terminalio.FONT,
     text_position=(10, 105),
+    text_scale=2,
+    #text_anchor_point=(0.5, 0.5),
+)
+
+magtag.add_text(
+    text_font=terminalio.FONT,
+    text_position=(220, 105),
     text_scale=2,
     #text_anchor_point=(0.5, 0.5),
 )
@@ -149,16 +166,16 @@ print("-" * 40)
 while True:
     if magtag.peripherals.button_a_pressed:
         print("Button_A Pressed")
-        aircraft = "speedster"
+        key = "speedster"
         registration = "N221TM"
-        print("Fetching ", registration, " aka ", aircraft, " Data from Adafruit IO")
-        print_feeds(aircraft, registration)
+        print("Fetching ", registration, " aka ", key, " Data from Adafruit IO")
+        print_feeds(key, registration)
     elif magtag.peripherals.button_b_pressed:
         print("Button_B Pressed")
-        aircraft = "big-speedey"
+        key = "3pw"
         registration = "N873PW"
-        print("Fetching ", registration, " aka ", aircraft, " Data from Adafruit IO")
-        print_feeds(aircraft, registration)
+        print("Fetching ", registration, " aka ", key, " Data from Adafruit IO")
+        print_feeds(key, registration)
     elif magtag.peripherals.button_c_pressed:
         print("Button_C Pressed Do nothing")
     elif magtag.peripherals.button_d_pressed:
