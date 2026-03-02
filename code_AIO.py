@@ -10,8 +10,8 @@ from adafruit_io.adafruit_io import IO_HTTP, AdafruitIO_RequestError
 import adafruit_connection_manager
 from adafruit_magtag.magtag import MagTag
 
-feed_name = []
-feed_last_value = []
+feed_name = None
+feed_last_value = None
 big_speedey_feed_name = []
 big_speedey_feed_last_value = []
 
@@ -47,33 +47,42 @@ if None not in {aio_username, aio_key}:
     print("Initialize an Adafruit IO HTTP API object")
     io = IO_HTTP(aio_username, aio_key, requests)
 
-def pull_feeds():
-    global speedster_feeds
-    global big_speedey_feeds
-    global speedster_num_feeds
-    global big_speedey_num_feeds
-    speedster_feeds = None
-    big_speedey_feeds = None
-    speedster_group = None
-    big_speedey_group = None
+def pull_feeds(aircraft):
     try:
         print("Connect to the Speedster and Big Speedey IO feeds")
-        speedster_group = io.get_group("speedster")  # refresh data via HTTP API
-        big_speedey_group = io.get_group("3pw")
-        print(speedster_group)
+        aircraft_group = io.get_group(aircraft)  # refresh data via HTTP API
+        print(aircraft_group)
         print()
         print()
-        speedster_feeds = speedster_group["feeds"]
-        print("speedster_feeds type: ", type(speedster_feeds))
-        print(speedster_feeds)
+        feeds = aircraft_group["feeds"]
+        print("feeds type: ", type(feeds))
+        print("feeds: ", feeds)
         print()
-        big_speedey_feeds = big_speedey_group["feeds"]
-        speedster_num_feeds = len(speedster_feeds)
-        big_speedey_num_feeds = len(big_speedey_feeds)
-        print("Number of Speedster Feeds: ", speedster_num_feeds)
-        print("Number of 3PW Feeds: ", big_speedey_num_feeds)
+        return feeds
     except:
         print("didnt get AIO feeds")
+
+def print_feeds(aircraft, registration):
+        print("Button for ", registration, " Pressed")
+        print("Fetching", registration, " Data from Adafruit IO")
+        feeds = pull_feeds(aircraft)
+        magtag.set_text(registration,0, False)
+        for i in range(len(feeds)):
+            feed_name = feeds[i]["name"]
+            feed_last_value = feeds[i]["last_value"]
+            if feed_name == "FuelRemaining":
+                print(feed_name, " ", feed_last_value)
+                magtag.set_text(feed_name + " " + feed_last_value, 1, False)
+            elif feed_name == "Hobbs":
+                print(feed_name, " ", feed_last_value)
+                magtag.set_text(feed_name + "       " + feed_last_value, 2, False)
+            elif feed_name == "SmokeLevel":
+                print(feed_name, " ", feed_last_value)
+                magtag.set_text(feed_name + "     " + feed_last_value, 3, True) 
+        print()
+        print("feed_name: ", feed_name)
+        print("feed_last_value: ", feed_last_value)
+        print()
 
 magtag = MagTag()
 magtag.peripherals.neopixel_disable = False
@@ -137,54 +146,22 @@ print("-" * 40)
 print(response.text)
 print("-" * 40)
 
-# if the AdafruitIO connection is active
-if io is not None:
-    pull_feeds()
-
-i = -1
 while True:
     if magtag.peripherals.button_a_pressed:
-        i=i+1
-        print("Button_A Pressed. i is now: ", i)
-        print("Fetching N221TM Data from Adafruit IO")
-        pull_feeds()
-        magtag.set_text("N221TM",0, False)
-
-        for speedster_num_feeds in speedster_feeds:
-            feed_name.append({speedster_feeds[i]["name"]}.pop())
-            feed_last_value.append({speedster_feeds[i]["last_value"]}.pop())
-            if feed_name[i] == "FuelRemaining":
-                print(feed_name[i], " ", feed_last_value[i])
-                magtag.set_text(feed_name[i] + " " + feed_last_value[i], 1, False)
-            elif feed_name[i] == "Hobbs":
-                print(feed_name[i], " ", feed_last_value[i])
-                magtag.set_text(feed_name[i] + "       " + feed_last_value[i], 2, False)
-            elif feed_name[i] == "SmokeLevel":
-                print(feed_name[i], " ", feed_last_value[i])
-                magtag.set_text(feed_name[i] + "     " + feed_last_value[i], 3, True) 
-        print()
-        print("feed_name: ", feed_name[i])
-        print("feed_last_value: ", feed_last_value[i])
-        print()
-
+        print("Button_A Pressed")
+        aircraft = "speedster"
+        registration = "N221TM"
+        print("Fetching ", registration, " aka ", aircraft, " Data from Adafruit IO")
+        print_feeds(aircraft, registration)
     elif magtag.peripherals.button_b_pressed:
         print("Button_B Pressed")
-        print("Fetching N873PW Data from Adafruit IO")
-        magtag.set_text("N873PW",0, False)
-        i=0
-        for big_speedey_num_feeds in big_speedey_feeds:
-            big_speedey_feed_name.append({big_speedey_feeds[i]["name"]}.pop())
-            big_speedey_feed_last_value.append({big_speedey_feeds[i]["last_value"]}.pop())
-            if big_speedey_feed_name[i] == "FuelRemaining":
-                print(big_speedey_feed_name[i], " ", big_speedey_feed_last_value[i])
-                magtag.set_text(big_speedey_feed_name[i] + " " + big_speedey_feed_last_value[i], 1, False)
-            elif big_speedey_feed_name[i] == "Hobbs":
-                print(big_speedey_feed_name[i], "  ", big_speedey_feed_last_value[i])
-                magtag.set_text(big_speedey_feed_name[i] + "         " + big_speedey_feed_last_value[i], 2, False)
-            elif big_speedey_feed_name[i] == "SmokeLevel":
-                print(big_speedey_feed_name[i], " ", big_speedey_feed_last_value[i])
-                magtag.set_text(big_speedey_feed_name[i] + "     " + big_speedey_feed_last_value[i], 3, True)
-            i=i+1    
-        print()
+        aircraft = "big-speedey"
+        registration = "N873PW"
+        print("Fetching ", registration, " aka ", aircraft, " Data from Adafruit IO")
+        print_feeds(aircraft, registration)
+    elif magtag.peripherals.button_c_pressed:
+        print("Button_C Pressed Do nothing")
+    elif magtag.peripherals.button_d_pressed:
+        print("Button_D Pressed Do nothing")
 
     time.sleep(0.25)
